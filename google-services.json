@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "864459573394",
+    "firebase_url": "https://prueba-68f20-default-rtdb.firebaseio.com",
+    "project_id": "prueba-68f20",
+    "storage_bucket": "prueba-68f20.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864459573394:android:47d0c218b63d25d9b43e4b",
+        "android_client_info": {
+          "package_name": "com.example.mazreparto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "864459573394-c59pp6bmhq2m6eccrp1oad5e14gsqqis.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlSR9lsTGD5FLDs9BKu1ILDzez6cA4t2A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "864459573394-c59pp6bmhq2m6eccrp1oad5e14gsqqis.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864459573394:android:1df2a87780248dbcb43e4b",
+        "android_client_info": {
+          "package_name": "com.example.mazrepartotienda"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "864459573394-c59pp6bmhq2m6eccrp1oad5e14gsqqis.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlSR9lsTGD5FLDs9BKu1ILDzez6cA4t2A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "864459573394-c59pp6bmhq2m6eccrp1oad5e14gsqqis.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
