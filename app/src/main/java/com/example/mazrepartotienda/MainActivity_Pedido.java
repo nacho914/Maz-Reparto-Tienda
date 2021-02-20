@@ -1,5 +1,6 @@
 package com.example.mazrepartotienda;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,7 +14,9 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import Modelos.Pedidos;
+import Modelos.TiemposMinutos;
 import Modelos.Usuarios;
 
 public class MainActivity_Pedido extends AppCompatActivity {
@@ -47,6 +51,7 @@ public class MainActivity_Pedido extends AppCompatActivity {
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference ref = database.getReference("Pedidos");
     DatabaseReference refUsuarios = database.getReference("Usuarios");
+    DatabaseReference refConfiguracion = database.getReference("Configuracion/Tiempos");
 
 
     EditText mColonia;
@@ -54,10 +59,10 @@ public class MainActivity_Pedido extends AppCompatActivity {
     EditText mNumeroCasa;
     EditText mNombreComensal;
     EditText mPago;
-    EditText mTiempo;
     EditText mTelefono;
     TextView mPedidos;
     String sNombreNegocio;
+    Spinner sMinutos;
     int iTotales=0;
 
     private ProgressDialog progressDialog;
@@ -73,14 +78,15 @@ public class MainActivity_Pedido extends AppCompatActivity {
          mNumeroCasa=findViewById(R.id.mNumeroCasa);
          mNombreComensal= findViewById(R.id.mNombreComensal);
          mPago= findViewById(R.id.mPago);
-         mTiempo= findViewById(R.id.mTiempo);
          mTelefono= findViewById(R.id.mTelefono);
          mPago= findViewById(R.id.mPago);
          mPedidos=findViewById(R.id.mCantidadPedidos);
          mPedidos.setText("0");
+        sMinutos = findViewById(R.id.sMinutos);
         progressDialog = new ProgressDialog(this);
 
          sNombreNegocio = "Panama";
+
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -107,6 +113,28 @@ public class MainActivity_Pedido extends AppCompatActivity {
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
                 Log.w("TAG", "Failed to read value.", error.toException());
+            }
+        });
+
+        refConfiguracion.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                TiemposMinutos tie = snapshot.getValue(TiemposMinutos.class);
+                String[] items= new String[(tie.minmax-tie.minmin)+1];
+                int iHelp=0;
+                for(int i=tie.minmin; i<=tie.minmax; i++)
+                {
+                    items[iHelp]=String.valueOf(i);
+                    iHelp++;
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, items);
+                sMinutos.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
 
@@ -147,7 +175,7 @@ public class MainActivity_Pedido extends AppCompatActivity {
         //String sNombreCliente = ServerValue.TIMESTAMP.toString();
         long iTelefono = Long.parseLong(mTelefono.getText().toString());
         int iPrecio = Integer.parseInt(mPago.getText().toString());
-        int iTiempo = Integer.parseInt(mTiempo.getText().toString());
+        int iTiempo = Integer.parseInt(sMinutos.getSelectedItem().toString());
 
 
         Pedidos pedido = new Pedidos(sNombreNegocio, sDireccion, iTelefono, sNombreCliente, iPrecio, iTiempo,"");
