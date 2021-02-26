@@ -1,24 +1,19 @@
 package com.example.mazrepartotienda;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -30,7 +25,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
@@ -41,7 +35,7 @@ import java.util.Map;
 
 import Modelos.Pedidos;
 import Modelos.TiemposMinutos;
-import Modelos.Usuarios;
+import Modelos.UsuariosRestaurantes;
 
 public class MainActivity_Pedido extends AppCompatActivity {
 
@@ -50,7 +44,7 @@ public class MainActivity_Pedido extends AppCompatActivity {
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference ref = database.getReference("Pedidos");
-    DatabaseReference refUsuarios = database.getReference("Usuarios");
+    DatabaseReference refUsuarios;
     DatabaseReference refConfiguracion = database.getReference("Configuracion/Tiempos");
 
 
@@ -64,6 +58,7 @@ public class MainActivity_Pedido extends AppCompatActivity {
     String sNombreNegocio;
     Spinner sMinutos;
     int iTotales=0;
+    String keyRestaurante;
 
     private ProgressDialog progressDialog;
 
@@ -84,8 +79,10 @@ public class MainActivity_Pedido extends AppCompatActivity {
          mPedidos.setText("0");
         sMinutos = findViewById(R.id.sMinutos);
         progressDialog = new ProgressDialog(this);
+        keyRestaurante = getIntent().getStringExtra("keyRestaurante");
 
-         sNombreNegocio = "Panama";
+        refUsuarios = database.getReference("Usuarios/UsuariosRestaurantes/"+keyRestaurante);
+        //sNombreNegocio = "Panama";
 
 
         ref.addValueEventListener(new ValueEventListener() {
@@ -138,6 +135,20 @@ public class MainActivity_Pedido extends AppCompatActivity {
             }
         });
 
+        refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                UsuariosRestaurantes Rest = snapshot.getValue(UsuariosRestaurantes.class);
+                sNombreNegocio = Rest.Nombre;
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
 
@@ -178,7 +189,7 @@ public class MainActivity_Pedido extends AppCompatActivity {
         int iTiempo = Integer.parseInt(sMinutos.getSelectedItem().toString());
 
 
-        Pedidos pedido = new Pedidos(sNombreNegocio, sDireccion, iTelefono, sNombreCliente, iPrecio, iTiempo,"");
+        Pedidos pedido = new Pedidos(sNombreNegocio, sDireccion, iTelefono, sNombreCliente, iPrecio, iTiempo,"",keyRestaurante);
 
         return pedido;
     }

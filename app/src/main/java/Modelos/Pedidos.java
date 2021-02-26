@@ -14,6 +14,7 @@ public class Pedidos {
     public int Precio;
     public int TiempoPedido;
     public String TrabajadorKey;
+    public String RestauranteKey;
     HashMap<String, Object> timestampCreated;
 
 
@@ -22,7 +23,7 @@ public class Pedidos {
 
     }
 
-    public Pedidos(String sNombreNegocio, String sDireccion, long iTelefono, String sNombre, int iPrecio, int iTiempo, String sTrabajadorKey) {
+    public Pedidos(String sNombreNegocio, String sDireccion, long iTelefono, String sNombre, int iPrecio, int iTiempo, String sTrabajadorKey, String sRestauranteKey) {
 
         this.NombreNegocio=sNombreNegocio;
         this.Direccion= sDireccion;
@@ -31,6 +32,7 @@ public class Pedidos {
         this.Precio=iPrecio;
         this.TiempoPedido=iTiempo;
         this.TrabajadorKey = sTrabajadorKey;
+        this.RestauranteKey=sRestauranteKey;
 
         HashMap<String, Object> timestampNow = new HashMap<>();
         timestampNow.put("timestamp", ServerValue.TIMESTAMP);

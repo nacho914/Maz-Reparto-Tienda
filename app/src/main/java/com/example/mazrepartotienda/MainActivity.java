@@ -13,6 +13,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,10 +46,14 @@ public class MainActivity extends AppCompatActivity {
     private String serverKey = "key=" + "AAAAyUXOSJI:APA91bHRcWTrD3LB50qTECUJsKB5pCaUL5pOZBzsMcQHEwX_xyEujXHVkKcB9DpoHM39x_6IWVAUDM3jJ8peL_6W7DmtOJArJUWGmnOtW6RKz9Q7Vaqb2SXiUC5ygyex9OTqUD3sZ7Bc";
     private String contentType = "application/json";
 
+    public  String keyRestaurante;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        keyRestaurante = getIntent().getStringExtra("KeyTrabajador");
+
 
     }
 
@@ -189,9 +194,17 @@ public class MainActivity extends AppCompatActivity {
     public void mandarOtraActividad(View view)
     {
         Intent intent = new Intent(this, MainActivity_Pedido.class);
+        intent.putExtra("keyRestaurante", keyRestaurante);
         //EditText editText = (EditText) findViewById(R.id.editText);
         //String message = editText.getText().toString();
         //intent.putExtra(EXTRA_MESSAGE, message);
+        startActivity(intent);
+    }
+
+    public void cerrarSesion(View view)
+    {
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(this,MainActivity_Login.class);
         startActivity(intent);
     }
 }

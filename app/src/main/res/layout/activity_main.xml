@@ -12,6 +12,7 @@
         android:orientation="vertical"
         tools:layout_editor_absoluteX="94dp"
         tools:layout_editor_absoluteY="154dp">
+
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
@@ -24,7 +25,7 @@
 
         <Button
             android:id="@+id/button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="sendNotifications"
             android:text="Enviar Notificacion"
@@ -33,12 +34,19 @@
 
         <Button
             android:id="@+id/button2"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="mandarOtraActividad"
             android:text="Realizar registro"
             tools:layout_editor_absoluteX="81dp"
             tools:layout_editor_absoluteY="561dp" />
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="cerrarSesion"
+            android:text="Cerrar Sesion" />
 
     </LinearLayout>
 
