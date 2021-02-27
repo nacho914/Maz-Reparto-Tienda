@@ -1,11 +1,14 @@
 package com.example.mazrepartotienda;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -14,15 +17,19 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import Modelos.Pedidos;
 import Retroapi.APIService.APIService;
 import Retroapi.APIService.APIService2;
 import Retroapi.APIService.ApiUtils;
@@ -42,18 +49,31 @@ public class MainActivity extends AppCompatActivity {
     private APIService mAPIService;
     private APIService2 mAPIService2;
 
-    private String FCM_API = "https://fcm.googleapis.com/fcm/send";
-    private String serverKey = "key=" + "AAAAyUXOSJI:APA91bHRcWTrD3LB50qTECUJsKB5pCaUL5pOZBzsMcQHEwX_xyEujXHVkKcB9DpoHM39x_6IWVAUDM3jJ8peL_6W7DmtOJArJUWGmnOtW6RKz9Q7Vaqb2SXiUC5ygyex9OTqUD3sZ7Bc";
-    private String contentType = "application/json";
+    private final String FCM_API = "https://fcm.googleapis.com/fcm/send";
+    private final String serverKey = "key=" + "AAAAyUXOSJI:APA91bHRcWTrD3LB50qTECUJsKB5pCaUL5pOZBzsMcQHEwX_xyEujXHVkKcB9DpoHM39x_6IWVAUDM3jJ8peL_6W7DmtOJArJUWGmnOtW6RKz9Q7Vaqb2SXiUC5ygyex9OTqUD3sZ7Bc";
+    private final String contentType = "application/json";
+    public TextView mPedidos;
+
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference ref = database.getReference("Pedidos/Activos");
 
     public  String keyRestaurante;
+    int iTotales=0;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        keyRestaurante = getIntent().getStringExtra("KeyTrabajador");
 
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Maz Reparto");
+        progressDialog.setMessage("Cargando Datos");
+        progressDialog.show();
+
+        keyRestaurante = getIntent().getStringExtra("keyRestaurante");
+        mPedidos=findViewById(R.id.mCantidadPedidos);
+        CargaTotales();
 
     }
 
@@ -205,6 +225,44 @@ public class MainActivity extends AppCompatActivity {
     {
         FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(this,MainActivity_Login.class);
+        startActivity(intent);
+    }
+
+    public void CargaTotales()
+    {
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot PedidoSnapshot: dataSnapshot.getChildren()) {
+
+                        Pedidos pedido = PedidoSnapshot.getValue(Pedidos.class);
+
+                        if(pedido.RestauranteKey.equals(keyRestaurante))
+                            iTotales++;
+                    }
+                    mPedidos.setText(String.valueOf(iTotales));
+                    iTotales=0;
+                    progressDialog.dismiss();
+
+                }
+                else{
+                    mPedidos.setText("0");
+                    progressDialog.dismiss();
+                }
+
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                progressDialog.dismiss();
+            }
+        });
+    }
+
+    public void sendList(View view)
+    {
+        Intent intent = new Intent(this,MainActivity_list.class);
+        intent.putExtra("keyRestaurante", keyRestaurante);
         startActivity(intent);
     }
 }

@@ -154,7 +154,7 @@ public class MainActivity_Login extends AppCompatActivity {
                     if(user.Correo.equals(sCorreo))
                     {
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.putExtra("KeyTrabajador", UsuarioSnapshot.getKey());
+                        intent.putExtra("keyRestaurante", UsuarioSnapshot.getKey());
                         startActivity(intent);
                         break;
                     }
@@ -186,7 +186,7 @@ public class MainActivity_Login extends AppCompatActivity {
 
             progressDialog.dismiss();
             Intent intent = new Intent(MainActivity_Login.this, MainActivity.class);
-            intent.putExtra("KeyTrabajador", key);
+            intent.putExtra("keyRestaurante", key);
             startActivity(intent);
 
         });

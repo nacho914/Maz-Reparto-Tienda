@@ -97,7 +97,7 @@ public class MainActivity_Splash extends AppCompatActivity {
                     if(user.Correo.equals(sCorreo))
                     {
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.putExtra("KeyTrabajador", UsuarioSnapshot.getKey());
+                        intent.putExtra("keyRestaurante", UsuarioSnapshot.getKey());
                         startActivity(intent);
                         break;
                     }

@@ -11,7 +11,7 @@ public class Pedidos {
     public String Direccion;
     public long Telefono;
     public String NombreCliente;
-    public int Precio;
+    public double Precio;
     public int TiempoPedido;
     public String TrabajadorKey;
     public String RestauranteKey;
@@ -23,13 +23,13 @@ public class Pedidos {
 
     }
 
-    public Pedidos(String sNombreNegocio, String sDireccion, long iTelefono, String sNombre, int iPrecio, int iTiempo, String sTrabajadorKey, String sRestauranteKey) {
+    public Pedidos(String sNombreNegocio, String sDireccion, long iTelefono, String sNombre, double dPrecio, int iTiempo, String sTrabajadorKey, String sRestauranteKey) {
 
         this.NombreNegocio=sNombreNegocio;
         this.Direccion= sDireccion;
         this.Telefono= iTelefono;
         this.NombreCliente=sNombre;
-        this.Precio=iPrecio;
+        this.Precio=dPrecio;
         this.TiempoPedido=iTiempo;
         this.TrabajadorKey = sTrabajadorKey;
         this.RestauranteKey=sRestauranteKey;

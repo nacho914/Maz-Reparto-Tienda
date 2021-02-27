@@ -3,22 +3,19 @@ package com.example.mazrepartotienda;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.database.DataSnapshot;
@@ -43,7 +40,7 @@ public class MainActivity_Pedido extends AppCompatActivity {
     //DatabaseReference myRef = database.getReference("");
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference ref = database.getReference("Pedidos");
+    DatabaseReference ref = database.getReference("Pedidos/Activos");
     DatabaseReference refUsuarios;
     DatabaseReference refConfiguracion = database.getReference("Configuracion/Tiempos");
 
@@ -54,10 +51,8 @@ public class MainActivity_Pedido extends AppCompatActivity {
     EditText mNombreComensal;
     EditText mPago;
     EditText mTelefono;
-    TextView mPedidos;
     String sNombreNegocio;
     Spinner sMinutos;
-    int iTotales=0;
     String keyRestaurante;
 
     private ProgressDialog progressDialog;
@@ -75,44 +70,24 @@ public class MainActivity_Pedido extends AppCompatActivity {
          mPago= findViewById(R.id.mPago);
          mTelefono= findViewById(R.id.mTelefono);
          mPago= findViewById(R.id.mPago);
-         mPedidos=findViewById(R.id.mCantidadPedidos);
-         mPedidos.setText("0");
         sMinutos = findViewById(R.id.sMinutos);
         progressDialog = new ProgressDialog(this);
         keyRestaurante = getIntent().getStringExtra("keyRestaurante");
 
         refUsuarios = database.getReference("Usuarios/UsuariosRestaurantes/"+keyRestaurante);
-        //sNombreNegocio = "Panama";
+
+        progressDialog.setTitle("Maz Reparto");
+        progressDialog.setMessage("Cargando Datos");
+        progressDialog.show();
+
+        actualizaTiempos();
 
 
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot PedidoSnapshot: dataSnapshot.getChildren()) {
 
-                        String nana = PedidoSnapshot.getKey();
-                        Pedidos pedido = PedidoSnapshot.getValue(Pedidos.class);
+    }
 
-                        if(pedido.NombreNegocio.equals(sNombreNegocio))
-                            iTotales++;
-                    }
-                    mPedidos.setText(String.valueOf(iTotales));
-                    iTotales=0;
-
-                }
-                else{
-                    mPedidos.setText("0");
-                }
-
-            }
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w("TAG", "Failed to read value.", error.toException());
-            }
-        });
-
+    public void actualizaTiempos()
+    {
         refConfiguracion.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -127,30 +102,33 @@ public class MainActivity_Pedido extends AppCompatActivity {
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, items);
                 sMinutos.setAdapter(adapter);
+                cargaNombreRest();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                progressDialog.dismiss();
             }
         });
+    }
 
+    public void cargaNombreRest()
+    {
         refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 UsuariosRestaurantes Rest = snapshot.getValue(UsuariosRestaurantes.class);
                 sNombreNegocio = Rest.Nombre;
+                progressDialog.dismiss();
 
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                progressDialog.dismiss();
             }
         });
-
     }
-
 
 
     public void RealizaRegistro(View view) throws JSONException {
@@ -159,17 +137,24 @@ public class MainActivity_Pedido extends AppCompatActivity {
         progressDialog.setMessage("Verificando Datos");
         progressDialog.show();
 
-        DatabaseReference NewUserPush = ref.push();
-        Pedidos pedido = llenarPedido();
+        if(validarDatos()) {
 
-        NewUserPush.setValue(pedido);
-        enviarNotificaciones(pedido);
+            DatabaseReference NewUserPush = ref.push();
+            Pedidos pedido = llenarPedido();
 
-        mostrarDialogo("Pedidos","Su pedido fue correctamente enviado");
-        progressDialog.dismiss();
-        //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        hideSoftKeyboard(view);
+            NewUserPush.setValue(pedido);
+            enviarNotificaciones(pedido);
 
+            limpiaCampos();
+            mostrarDialogo("Pedidos", "Su pedido fue correctamente enviado",true);
+            progressDialog.dismiss();
+            //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            hideSoftKeyboard(view);
+        }
+        else
+        {
+            progressDialog.dismiss();
+        }
     }
 
     public void hideSoftKeyboard(View view){
@@ -185,13 +170,12 @@ public class MainActivity_Pedido extends AppCompatActivity {
         String sNombreCliente = mNombreComensal.getText().toString();
         //String sNombreCliente = ServerValue.TIMESTAMP.toString();
         long iTelefono = Long.parseLong(mTelefono.getText().toString());
-        int iPrecio = Integer.parseInt(mPago.getText().toString());
+        Double dPrecio = Double.parseDouble(mPago.getText().toString());
+
         int iTiempo = Integer.parseInt(sMinutos.getSelectedItem().toString());
 
 
-        Pedidos pedido = new Pedidos(sNombreNegocio, sDireccion, iTelefono, sNombreCliente, iPrecio, iTiempo,"",keyRestaurante);
-
-        return pedido;
+        return new Pedidos(sNombreNegocio, sDireccion, iTelefono, sNombreCliente, dPrecio, iTiempo,"",keyRestaurante);
     }
 
 
@@ -211,20 +195,10 @@ public class MainActivity_Pedido extends AppCompatActivity {
         obj.put("notification",objChild);
 
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, postUrl, obj, new com.android.volley.Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, postUrl, obj, System.out::println, Throwable::printStackTrace) {
             @Override
-            public void onResponse(JSONObject response) {
-                System.out.println(response);
-            }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
+            public Map<String, String> getHeaders() {
+                Map<String, String>  params = new HashMap<>();
                 params.put("Authorization", "key=AAAAyUXOSJI:APA91bHRcWTrD3LB50qTECUJsKB5pCaUL5pOZBzsMcQHEwX_xyEujXHVkKcB9DpoHM39x_6IWVAUDM3jJ8peL_6W7DmtOJArJUWGmnOtW6RKz9Q7Vaqb2SXiUC5ygyex9OTqUD3sZ7Bc");
                 params.put("Content-Type", "application/json");
 
@@ -236,18 +210,57 @@ public class MainActivity_Pedido extends AppCompatActivity {
     }
 
 
-    public  void mostrarDialogo(String sTitulo, String sMensaje)
+    public  void mostrarDialogo(String sTitulo, String sMensaje, boolean bFinaliza)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(sTitulo);
         builder.setMessage(sMensaje);
         //builder.setPositiveButton("OK", null);
-        builder.setNeutralButton("Entendido",null);
-        builder.setInverseBackgroundForced(true);
+        if(bFinaliza) {
+            builder.setNeutralButton("Entendido", (dialog, which) -> {
+            Intent intent =new Intent(getApplicationContext(),MainActivity.class);
+            intent.putExtra("keyRestaurante", keyRestaurante);
+            startActivity(intent); });
 
+        }
+        else{
+            builder.setNeutralButton("Entendido", null);
+
+        }
+        builder.setInverseBackgroundForced(true);
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
+    public Boolean validarDatos()
+    {
+        boolean bRegresa=false;
+
+        if(mColonia.getText().toString().isEmpty() || mCalle.getText().toString().isEmpty() || mNumeroCasa.getText().toString().isEmpty()
+                ||mNombreComensal.getText().toString().isEmpty() || mPago.getText().toString().isEmpty() || mTelefono.getText().toString().isEmpty() )
+        {
+            mostrarDialogo("Registro","Favor de validar que los datos sean correctos",false);
+        }
+        else
+        {
+            bRegresa=true;
+        }
+
+        return bRegresa;
+    }
+
+    public void limpiaCampos()
+    {
+        mColonia.setText("");
+        mCalle.setText("");
+        mNumeroCasa.setText("");
+        mNombreComensal.setText("");
+        mPago.setText("");
+        sMinutos.setSelection(0);
+        mTelefono.setText("");
+
+    }
+
 
      /*
     public void obtenerKeyCelulares(Pedidos pedido)
