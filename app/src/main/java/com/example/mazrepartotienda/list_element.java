@@ -4,17 +4,19 @@ public class list_element {
     public String Titulo;
     public String Dinero;
     public String PedidoKey;
-    public String TrabajadorKey;
+    public String RestauranteKey;
     public long TiempoActualPedido;
     public int tiempoPedido;
+    public int tipoPedido;
 
-    public list_element(String titulo, String pedidoKey,String dinero, String sKeyTrabajador,long lTiempoPedido,int iTiempo) {
+    public list_element(String titulo, String pedidoKey,String dinero, String sKeyRestaurante,long lTiempoPedido,int iTiempo,int iTipoPedido) {
         Titulo = titulo;
         PedidoKey = pedidoKey;
         Dinero=dinero;
-        TrabajadorKey=sKeyTrabajador;
+        RestauranteKey=sKeyRestaurante;
         TiempoActualPedido=lTiempoPedido;
         tiempoPedido=iTiempo;
+        tipoPedido=iTipoPedido;
     }
 
     public String getTitulo() {
@@ -41,12 +43,12 @@ public class list_element {
         Dinero = dinero;
     }
 
-    public String getTrabajadorKey() {
-        return TrabajadorKey;
+    public String geRestauranteKey() {
+        return RestauranteKey;
     }
 
-    public void setTrabajadorKey(String trabajadorKey) {
-        TrabajadorKey = trabajadorKey;
+    public void setRestauranteKey(String restauranteKey) {
+        RestauranteKey = restauranteKey;
     }
 
     public long getTiempoActualPedido() {
@@ -63,6 +65,14 @@ public class list_element {
 
     public void setTiempoPedido(int tiempoPedido) {
         this.tiempoPedido = tiempoPedido;
+    }
+
+    public int getTipoPedido() {
+        return tipoPedido;
+    }
+
+    public void setTipoPedido(int tipoPedido) {
+        this.tipoPedido = tipoPedido;
     }
 
 }

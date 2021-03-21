@@ -243,7 +243,10 @@ public class MainActivity_Pedido extends AppCompatActivity {
         }
         else
         {
-            bRegresa=true;
+            if(mTelefono.getText().toString().length()==10)
+                bRegresa=true;
+            else
+                mostrarDialogo("Registro","El telefono debe tener 10 digitos.",false);
         }
 
         return bRegresa;

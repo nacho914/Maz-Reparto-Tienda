@@ -1,12 +1,7 @@
 package com.example.mazrepartotienda;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +10,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,9 +32,8 @@ public class MainActivity_list extends AppCompatActivity {
 
 
     List<list_element> elements;
-    String keyTrabajador;
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference ref = database.getReference("Pedidos/Activos");
+    DatabaseReference ref = database.getReference("Pedidos");
     private ProgressDialog progressDialog;
     Spinner dropdown;
     String keyRestaurante;
@@ -74,7 +73,7 @@ public class MainActivity_list extends AppCompatActivity {
                         cargarDatosRepartidor();
                         break;
                     case 2:
-                        Toast.makeText(parent.getContext(), "Spinner item 3!", Toast.LENGTH_SHORT).show();
+                        cargarDatosFinalizados();
                         break;
 
                 }
@@ -90,7 +89,7 @@ public class MainActivity_list extends AppCompatActivity {
 
     public void cargarDatosActivos()
     {
-        ref.addValueEventListener(new ValueEventListener() {
+        ref.child("Activos").addValueEventListener(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -104,7 +103,7 @@ public class MainActivity_list extends AppCompatActivity {
                     assert pedido != null;
                     if(pedido.RestauranteKey.equals(keyRestaurante) && pedido.TrabajadorKey.isEmpty()) {
 
-                        elements.add(new list_element(pedido.NombreNegocio, PedidoSnapshot.getKey(), "$ " + pedido.Precio,keyTrabajador,pedido.getTimestampCreatedLong(),pedido.TiempoPedido));
+                        elements.add(new list_element(pedido.NombreNegocio, PedidoSnapshot.getKey(), "$ " + pedido.Precio,keyRestaurante,pedido.getTimestampCreatedLong(),pedido.TiempoPedido,dropdown.getSelectedItemPosition()));
                     }
                 }
                 cargarDatosLista();
@@ -123,7 +122,7 @@ public class MainActivity_list extends AppCompatActivity {
 
     public void cargarDatosRepartidor()
     {
-        ref.addValueEventListener(new ValueEventListener() {
+        ref.child("Activos").addValueEventListener(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -135,7 +134,36 @@ public class MainActivity_list extends AppCompatActivity {
 
                     if(pedido.RestauranteKey.equals(keyRestaurante) && !pedido.TrabajadorKey.isEmpty()) {
 
-                        elements.add(new list_element(pedido.NombreNegocio, PedidoSnapshot.getKey(), "$ " + pedido.Precio, keyTrabajador,pedido.getTimestampCreatedLong(),pedido.TiempoPedido));
+                        elements.add(new list_element(pedido.NombreNegocio, PedidoSnapshot.getKey(), "$ " + pedido.Precio, keyRestaurante,pedido.getTimestampCreatedLong(),pedido.TiempoPedido,dropdown.getSelectedItemPosition()));
+                    }
+                }
+                cargarDatosLista();
+                progressDialog.dismiss();
+
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Failed to read value
+                progressDialog.dismiss();
+                Log.w("TAG", "Failed to read value.", error.toException());
+            }
+        });
+    }
+
+    public void cargarDatosFinalizados()
+    {
+        ref.child("Finalizados").addValueEventListener(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                elements = new ArrayList<>();
+
+                for (DataSnapshot PedidoSnapshot: dataSnapshot.getChildren()) {
+                    Pedidos pedido = PedidoSnapshot.getValue(Pedidos.class);
+
+                    if(pedido.RestauranteKey.equals(keyRestaurante)) {
+                        elements.add(new list_element(pedido.NombreNegocio, PedidoSnapshot.getKey(), "$ " + pedido.Precio, keyRestaurante,pedido.getTimestampCreatedLong(),pedido.TiempoPedido, dropdown.getSelectedItemPosition()));
                     }
                 }
                 cargarDatosLista();
@@ -152,6 +180,12 @@ public class MainActivity_list extends AppCompatActivity {
     }
 
 
+     public void regresarPrincipal(View view)
+     {
+         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+         intent.putExtra("keyRestaurante",keyRestaurante);
+         startActivity(intent);
+     }
 
     public void cargarDatosLista()
     {

@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/iconomaz"
         android:supportsRtl="true"
         android:theme="@style/Theme.MazRepartoTienda">
+        <activity android:name=".MainActivity_detalle"></activity>
         <activity android:name=".MainActivity_Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

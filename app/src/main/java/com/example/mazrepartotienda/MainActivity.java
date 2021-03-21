@@ -53,12 +53,15 @@ public class MainActivity extends AppCompatActivity {
     private final String serverKey = "key=" + "AAAAyUXOSJI:APA91bHRcWTrD3LB50qTECUJsKB5pCaUL5pOZBzsMcQHEwX_xyEujXHVkKcB9DpoHM39x_6IWVAUDM3jJ8peL_6W7DmtOJArJUWGmnOtW6RKz9Q7Vaqb2SXiUC5ygyex9OTqUD3sZ7Bc";
     private final String contentType = "application/json";
     public TextView mPedidos;
+    public TextView mCantidadPedidosFin;
+    public TextView mCantidadPedidosProc;
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference ref = database.getReference("Pedidos/Activos");
+    DatabaseReference ref = database.getReference("Pedidos");
 
     public  String keyRestaurante;
     int iTotales=0;
+    int iTotalesProc=0;
     private ProgressDialog progressDialog;
 
     @Override
@@ -73,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
 
         keyRestaurante = getIntent().getStringExtra("keyRestaurante");
         mPedidos=findViewById(R.id.mCantidadPedidos);
+        mCantidadPedidosFin= findViewById(R.id.mCantidadPedidosFin);
+        mCantidadPedidosProc=findViewById(R.id.mCantidadPedidosProce);
         CargaTotales();
 
     }
@@ -230,27 +235,68 @@ public class MainActivity extends AppCompatActivity {
 
     public void CargaTotales()
     {
-        ref.addValueEventListener(new ValueEventListener() {
+        ref.child("Activos").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+
                     for (DataSnapshot PedidoSnapshot: dataSnapshot.getChildren()) {
 
                         Pedidos pedido = PedidoSnapshot.getValue(Pedidos.class);
 
-                        if(pedido.RestauranteKey.equals(keyRestaurante))
-                            iTotales++;
+                        assert pedido != null;
+                        if(pedido.RestauranteKey.equals(keyRestaurante)) {
+                            if(pedido.TrabajadorKey.isEmpty())
+                                iTotales++;
+                            else
+                                iTotalesProc++;
+                        }
                     }
+
                     mPedidos.setText(String.valueOf(iTotales));
+                    mCantidadPedidosProc.setText(String.valueOf(iTotalesProc));
+
+                    iTotalesProc=0;
                     iTotales=0;
-                    progressDialog.dismiss();
 
                 }
                 else{
                     mPedidos.setText("0");
-                    progressDialog.dismiss();
+                }
+                cargarFinalizados();
+                //progressDialog.dismiss();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                progressDialog.dismiss();
+            }
+        });
+    }
+
+    public void cargarFinalizados()
+    {
+        ref.child("Finalizados").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+
+                    for (DataSnapshot PedidoSnapshot: dataSnapshot.getChildren()) {
+
+                        Pedidos pedido = PedidoSnapshot.getValue(Pedidos.class);
+
+                        assert pedido != null;
+                        if( pedido.RestauranteKey.equals(keyRestaurante))
+                            iTotales++;
+                    }
+                    mCantidadPedidosFin.setText(String.valueOf(iTotales));
+                    iTotales=0;
+
+                }
+                else{
+                    mCantidadPedidosFin.setText("0");
                 }
 
+                progressDialog.dismiss();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
