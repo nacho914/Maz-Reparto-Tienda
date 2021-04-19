@@ -143,7 +143,33 @@ public class MainActivity_Pedido extends AppCompatActivity {
             Pedidos pedido = llenarPedido();
 
             NewUserPush.setValue(pedido);
-            enviarNotificaciones(pedido);
+            enviarNotificaciones(pedido,1);
+
+            limpiaCampos();
+            mostrarDialogo("Pedidos", "Su pedido fue correctamente enviado",true);
+            progressDialog.dismiss();
+            //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            hideSoftKeyboard(view);
+        }
+        else
+        {
+            progressDialog.dismiss();
+        }
+    }
+
+    public void RealizaRegistroDirecto(View view) throws JSONException {
+
+        progressDialog.setTitle("Maz Reparto");
+        progressDialog.setMessage("Verificando Datos");
+        progressDialog.show();
+
+        if(validarDatos()) {
+
+            DatabaseReference NewUserPush = ref.push();
+            Pedidos pedido = llenarPedido();
+
+            NewUserPush.setValue(pedido);
+            enviarNotificaciones(pedido,2);
 
             limpiaCampos();
             mostrarDialogo("Pedidos", "Su pedido fue correctamente enviado",true);
@@ -179,7 +205,7 @@ public class MainActivity_Pedido extends AppCompatActivity {
     }
 
 
-    public void enviarNotificaciones(Pedidos pedido) throws JSONException
+    public void enviarNotificaciones(Pedidos pedido, int iTipoPedido) throws JSONException
     {
         String postUrl = "https://fcm.googleapis.com/fcm/send";
         RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -187,7 +213,12 @@ public class MainActivity_Pedido extends AppCompatActivity {
         JSONObject obj = new JSONObject();
         JSONObject objChild = new JSONObject();
 
-        obj.put("to","/topics/NotificacionesPedidos");
+        if(iTipoPedido==1)
+            obj.put("to", "/topics/NotificacionesPedidos");
+
+        else
+            obj.put("to", "/topics/NotificacionesPedidosAdministradores");
+
         obj.put("direct_book_ok",true);
 
         objChild.put("body",pedido.Direccion);

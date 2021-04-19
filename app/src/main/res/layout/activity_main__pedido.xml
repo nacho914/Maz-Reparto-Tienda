@@ -120,16 +120,28 @@
                 android:maxLength="10" />
 
             <Button
+                android:id="@+id/mBtnRegistro2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Realizar Registro directo"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="50dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginBottom="10dp"
+                android:onClick="RealizaRegistroDirecto"/>
+
+            <Button
                 android:id="@+id/mBtnRegistro"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
-                android:onClick="RealizaRegistro"
-                android:text="Realizar registro "
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="24dp"
-                android:layout_marginBottom="40dp"/>
+                android:layout_marginBottom="40dp"
+                android:enabled="false"
+                android:onClick="RealizaRegistro"
+                android:text="Realizar registro " />
 
         </LinearLayout>
 
