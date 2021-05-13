@@ -106,6 +106,25 @@
                 android:gravity="center"
                 android:textStyle="bold"/>
 
+            <TextView
+                android:id="@+id/textTel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Telefono del repartidor"
+                android:layout_marginTop="15dp"
+                />
+
+            <TextView
+                android:id="@+id/mNumeroRepartidor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="6674771743"
+                android:textSize="24sp"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textIsSelectable="true"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

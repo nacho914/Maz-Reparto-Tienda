@@ -41,6 +41,7 @@ public class MainActivity_detalle extends AppCompatActivity {
     TextView mTelefono;
     TextView mTiempo;
     TextView mNombreRepartidor;
+    TextView mTelefonoRepartidor;
     Button mActualiza;
     private ProgressDialog progressDialog;
     boolean bEsApartado = false;
@@ -69,6 +70,7 @@ public class MainActivity_detalle extends AppCompatActivity {
         mTiempo=findViewById(R.id.mTiempo);
         mActualiza=findViewById(R.id.mBtnApartarPedido);
         mNombreRepartidor=findViewById(R.id.mNombreRepartidor);
+        mTelefonoRepartidor =findViewById(R.id.mNumeroRepartidor);
 
         progressDialog = new ProgressDialog(this);
 
@@ -147,10 +149,12 @@ public class MainActivity_detalle extends AppCompatActivity {
                     UsuariosRestaurantes usuariosRestaurantes = dataSnapshot.getValue(UsuariosRestaurantes.class);
                     assert usuariosRestaurantes != null;
                     mNombreRepartidor.setText(usuariosRestaurantes.Nombre);
+                    mTelefonoRepartidor.setText(String.valueOf(usuariosRestaurantes.Telefono));
 
                 }
                 else {
                     mNombreRepartidor.setText("Repartidor no asignado");
+                    mTelefonoRepartidor.setText("Repartidor no asignado");
                 }
                 progressDialog.dismiss();
 
@@ -200,7 +204,8 @@ public class MainActivity_detalle extends AppCompatActivity {
 
     /*
 
-    public  void mostrarDialogo(String sTitulo, String sMensaje,Boolean bFinaliza)
+    public  void
+    mostrarDialogo(String sTitulo, String sMensaje,Boolean bFinaliza)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(sTitulo);
